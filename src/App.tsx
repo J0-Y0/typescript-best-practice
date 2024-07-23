@@ -1,25 +1,15 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import NavBar from "./components/NavBar";
+import Cart from "./components/Cart";
 
 const App = () => {
-  const [bugs, setBugs] = useState([
-    { id: 1, title: "Bug 1", fixed: false },
-    { id: 2, title: "Bug 2", fixed: false },
-  ]);
-
+  const [carts, setCart] = useState(["product 1", "product 2", "product 3"]);
   return (
     <>
-      {console.log(bugs[0].title, bugs[0].fixed)}
-      <button
-        onClick={() =>
-          setBugs(
-            bugs.map((bug) =>
-              bug.id === 1 ? { ...bug, fixed: !bug.fixed } : bug
-            )
-          )
-        }
-      >
-        fix bug
-      </button>
+      <NavBar cartNumber={carts.length} />
+      <Cart carts={carts} />
+      <button onClick={() => setCart(["product 4", ...carts])}>add cart</button>
+      <button onClick={() => setCart([])}>clear cats</button>
     </>
   );
 };
