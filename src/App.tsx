@@ -1,26 +1,24 @@
 import { useState } from "react";
 
 const App = () => {
-  const [customer, setCustomer] = useState({
-    name: "john",
-    address: {
-      city: "San Francisco",
-      zipCode: 1111,
-    },
-  });
+  const [bugs, setBugs] = useState([
+    { id: 1, title: "Bug 1", fixed: false },
+    { id: 2, title: "Bug 2", fixed: false },
+  ]);
 
   return (
     <>
-      {console.log(customer.address.zipCode)}
+      {console.log(bugs[0].title, bugs[0].fixed)}
       <button
         onClick={() =>
-          setCustomer({
-            ...customer,
-            address: { ...customer.address, zipCode: 2222 },
-          })
+          setBugs(
+            bugs.map((bug) =>
+              bug.id === 1 ? { ...bug, fixed: !bug.fixed } : bug
+            )
+          )
         }
       >
-        add to cart
+        fix bug
       </button>
     </>
   );
