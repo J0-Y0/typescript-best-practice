@@ -1,27 +1,31 @@
-import React, { FormEvent, useRef } from "react";
+import React, { ChangeEvent, FormEvent, useRef, useState } from "react";
 
 const Form = () => {
-  const nameRef = useRef<HTMLInputElement>(null);
-  const ageRef = useRef<HTMLInputElement>(null);
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    const person = {
-      name: "",
-      age: 0,
-    };
-
-    if (nameRef.current)
-      if (nameRef.current != null) person.name = nameRef.current.value;
-    if (ageRef.current != null) person.age = parseInt(ageRef.current.value);
-    console.log(person);
+  const [person, setPerson] = useState({
+    name: "",
+    age: "",
+  });
+  const handleSubmit = (event: ChangeEvent<HTMLInputElement>) => {
+    setPerson({
+      ...person,
+      [event.target.name]: event.target.value,
+    });
   };
+
   return (
-    <form action="" onSubmit={handleSubmit}>
+    <form
+      action=""
+      onSubmit={(event) => {
+        event.preventDefault();
+        console.log(person);
+      }}
+    >
       <label htmlFor="name" className="form-label">
-        name
+        Name
       </label>
       <input
-        ref={nameRef}
+        value={person.name}
+        onChange={handleSubmit}
         type="text"
         name="name"
         id="name"
@@ -31,13 +35,14 @@ const Form = () => {
         age
       </label>
       <input
-        ref={ageRef}
+        value={person.age}
+        onChange={handleSubmit}
         type="number"
+        className="form-control"
         name="age"
         id="age"
-        className="form-control"
       />
-      <input type="submit" className="btn btn-primary " value="submit" />
+      <input type="submit" value="submit" className="btn btn-primary mt-2" />
     </form>
   );
 };
