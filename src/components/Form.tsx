@@ -1,12 +1,35 @@
+// npm i zod
+// npm i react-hook-form
+//npm i @reacthook/resolvers
 import React from "react";
 import { FieldValues, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+//define schema
+const schema = z.object({
+  name: z
+    .string()
+    .startsWith("yos", { message: "Must start with yos" })
+    .min(4)
+    .max(7),
+  age: z
+    .number({ invalid_type_error: "invalid  format" })
+    .positive({ message: "must be positive" })
+    .min(25),
+});
+// type is similar to interface
+type FormData = z.infer<typeof schema>;
 
 const Form = () => {
+  // integrate zod and react-hook-form ,useForm
+  //using resolvers
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm();
+    formState: { errors, isValid, ii },
+  } = useForm<FormData>({ resolver: zodResolver(schema) });
+
   const onSubmit = (data: FieldValues) => {
     console.log(data);
   };
@@ -17,42 +40,40 @@ const Form = () => {
         Full name
       </label>
       <input
-        {...register("name", { required: true, minLength: 5 })}
+        {...register("name")}
         id="name"
         type="text"
         className="form-control"
       />
-      {errors.name?.type === "minLength" && (
-        <label htmlFor="age" className="form-label">
-          invalid name, too small
+      {errors.name && (
+        <label htmlFor="name" className="form-label text-danger">
+          {errors.name.message}
         </label>
       )}
-      {errors.name?.type === "required" && (
-        <label htmlFor="age" className="form-label">
-          name is required
-        </label>
-      )}
+
+      <br></br>
       <label htmlFor="age" className="form-label">
         Your age
       </label>
 
       <input
-        {...register("age", { required: true, minLength: 5 })}
+        {...register("age", { valueAsNumber: true })}
         type="number"
         id="age"
         className="form-control"
       />
-      {errors.age?.type === "minLength" && (
-        <label htmlFor="age" className="form-label">
-          invalid age, too small
+      {errors.age && (
+        <label htmlFor="age" className="form-label text-danger">
+          {errors.age.message}
         </label>
       )}
-      {errors.age?.type === "required" && (
-        <label htmlFor="age" className="form-label">
-          required
-        </label>
-      )}
-      <input type="submit" value="submit" className="btn btn-primary my-2" />
+      <br></br>
+      <input
+        type="submit"
+        // disabled={ !isValid}
+        value="submit"
+        className="btn btn-primary my-2"
+      />
     </form>
   );
 };
