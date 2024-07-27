@@ -32,11 +32,23 @@ const App = () => {
 
     return () => controller.abort();
   }, []);
+
+  const handleDelete = (id: number) => {
+    const oldUsers = [...users]
+    
+    // to risky apprach
+    setUsers(users.filter((user) => user.id !== id))
+    axios
+      .delete("https://jsonplaceholder.typicode.com/xusers/" + id)
+      .catch((e) => {
+        setError(e.message)
+        setUsers(oldUsers)
+      });
+    
+  };
   return (
     <>
-      {loading&& <div className="spinner-border">
-        </div>
-      }
+      {loading && <div className="spinner-border"></div>}
       {error && <p className="text-danger">{error}</p>}
       <table className="table">
         <thead>
@@ -44,14 +56,23 @@ const App = () => {
             <th>id</th>
             <th>name</th>
             <th>email</th>
+            <th>action</th>
           </tr>
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr>
+            <tr key={user.id}>
               <td>{user.id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
+              <td>
+                <button
+                  className="btn btn-sm btn-danger"
+                  onClick={() => handleDelete(user.id)}
+                >
+                  delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
