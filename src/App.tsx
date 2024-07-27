@@ -25,10 +25,10 @@ const App = () => {
 
         if (err instanceof CanceledError) return;
         setError(err.message);
-                // setLoading(false);
+        // setLoading(false);
 
       })
-      // .finally(() => setLoading(false));
+    // .finally(() => setLoading(false));
 
     return () => controller.abort();
   }, []);
@@ -40,35 +40,49 @@ const App = () => {
     // to risky apprach
     setUsers(users.filter((user) => user.id !== id))
     axios
-      .delete("https://jsonplaceholder.typicode.com/xusers/" + id)
+      .delete("https://jsonplaceholder.typicode.com/users/" + id)
       .catch((e) => {
         setError(e.message)
         setUsers(oldUsers)
       });
     
   };
-    const addUser = () => {
-      const user = {
-        name: "yosef",
-        id: 0,
-        email:"yo@yo.com"
-      };
-
-      // to risky apprach
-      setUsers([user,...users]);
-      axios
-        .post("https://jsonplaceholder.typicode.com/users", user)
-        .then(({ data: newUser }) => setUsers([newUser, ...users]))
-        .catch((e) => {
-          setError(e.message);
-          // setUsers(oldUsers);
-        });
+  const addUser = () => {
+    const user = {
+      name: "yosef",
+      id: 0,
+      email: "yo@yo.com"
     };
+
+    // to risky apprach
+    setUsers([user, ...users]);
+    axios
+      .post("https://jsonplaceholder.typicode.com/users", user)
+      .then(({ data: newUser }) => setUsers([newUser, ...users]))
+      .catch((e) => {
+        setError(e.message);
+        // setUsers(oldUsers);
+      });
+  };
+  const updateUser = (user: User) => {
+    const oldUsers = [...users]
+    const updatedUser = { ...user, name: user.name + "=jo" }
+    setUsers(users.map(u => u.id === user.id ? updatedUser : u))
+    axios
+      .put("https://jsonplaceholder.typicode.com/users/" + user.id, updateUser)
+      .catch((e) => {
+        setError(e.message);
+        setUsers(oldUsers)
+      });
+    
+  }
   return (
     <>
       {loading && <div className="spinner-border"></div>}
       {error && <p className="text-danger">{error}</p>}
-      <button className="btn btn-primary" onClick={addUser}>add user</button>
+      <button className="btn btn-primary" onClick={addUser}>
+        add user
+      </button>
       <table className="table">
         <thead>
           <tr>
@@ -90,6 +104,12 @@ const App = () => {
                   onClick={() => handleDelete(user.id)}
                 >
                   delete
+                </button>
+                <button
+                  className="btn btn-sm btn-secondary"
+                  onClick={() => updateUser(user)}
+                >
+                  update
                 </button>
               </td>
             </tr>
