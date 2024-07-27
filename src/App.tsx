@@ -1,36 +1,27 @@
 import { useEffect, useState } from "react";
-import apiClient, { CanceledError } from "./service/api-client";
-interface User {
-  id: number;
-  name: String;
-  email: String;
-}
+import  { CanceledError } from "./service/api-client";
+import  UserService, { User  }from "./service/user-service";
+
 const App = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const controller = new AbortController();
     setLoading(true);
-    apiClient
-      .get("", {
-        signal: controller.signal,
-      })
-      .then((res) => {
-        setLoading(false);
-        setUsers(res.data);
-      })
-      .catch((err) => {
+    
+    const {request,cancel} = UserService.getAllUser()
+      request
+        .then((res) => {
+          setLoading(false);
+          setUsers(res.data);
+        })
+        .catch((err) => {
+          if (err instanceof CanceledError) return;
+          setError(err.message);
+        });
 
-        if (err instanceof CanceledError) return;
-        setError(err.message);
-        // setLoading(false);
-
-      })
-    // .finally(() => setLoading(false));
-
-    return () => controller.abort();
+    return () => cancel();
   }, []);
 
 
@@ -39,12 +30,11 @@ const App = () => {
     
     // to risky apprach
     setUsers(users.filter((user) => user.id !== id))
-    apiClient
-      .delete(""+ id)
+    UserService.deleteUser(id)
       .catch((e) => {
         setError(e.message)
         setUsers(oldUsers)
-      });
+      }); 
     
   };
   const addUser = () => {
@@ -56,8 +46,7 @@ const App = () => {
 
     // to risky apprach
     setUsers([user, ...users]);
-    apiClient
-      .post("", user)
+    UserService.addNewUser(user)
       .then(({ data: newUser }) => setUsers([newUser, ...users]))
       .catch((e) => {
         setError(e.message);
@@ -68,12 +57,10 @@ const App = () => {
     const oldUsers = [...users]
     const updatedUser = { ...user, name: user.name + "=jo" }
     setUsers(users.map(u => u.id === user.id ? updatedUser : u))
-    apiClient
-      .put("" + user.id, updateUser)
-      .catch((e) => {
-        setError(e.message);
-        setUsers(oldUsers)
-      });
+    UserService.updateUser(updatedUser).catch((e) => {
+      setError(e.message);
+      setUsers(oldUsers);
+    });
     
   }
   return (
