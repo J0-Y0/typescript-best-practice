@@ -33,6 +33,7 @@ const App = () => {
     return () => controller.abort();
   }, []);
 
+
   const handleDelete = (id: number) => {
     const oldUsers = [...users]
     
@@ -46,10 +47,28 @@ const App = () => {
       });
     
   };
+    const addUser = () => {
+      const user = {
+        name: "yosef",
+        id: 0,
+        email:"yo@yo.com"
+      };
+
+      // to risky apprach
+      setUsers([user,...users]);
+      axios
+        .post("https://jsonplaceholder.typicode.com/users", user)
+        .then(({ data: newUser }) => setUsers([newUser, ...users]))
+        .catch((e) => {
+          setError(e.message);
+          // setUsers(oldUsers);
+        });
+    };
   return (
     <>
       {loading && <div className="spinner-border"></div>}
       {error && <p className="text-danger">{error}</p>}
+      <button className="btn btn-primary" onClick={addUser}>add user</button>
       <table className="table">
         <thead>
           <tr>
