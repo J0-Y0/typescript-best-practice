@@ -10,7 +10,7 @@ const App = () => {
   useEffect(() => {
     setLoading(true);
     
-    const {request,cancel} = UserService.getAllUser()
+    const {request,cancel} = UserService.getAll<User>()
       request
         .then((res) => {
           setLoading(false);
@@ -46,7 +46,7 @@ const App = () => {
 
     // to risky apprach
     setUsers([user, ...users]);
-    UserService.addNewUser(user)
+    UserService.create(user)
       .then(({ data: newUser }) => setUsers([newUser, ...users]))
       .catch((e) => {
         setError(e.message);
